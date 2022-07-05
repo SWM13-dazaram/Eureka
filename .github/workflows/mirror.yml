@@ -14,4 +14,4 @@ jobs:
           target_repo_url:
             git@git.swmgit.org:swm-13-main/13_swm29/test.git
           ssh_private_key:                              # <-- use 'secrets' to pass credential information.
-            ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}
+            ${{ secrets }}
