@@ -25,7 +25,7 @@ Encoder : 재료 벡터를 인코딩<br>
 Decoder : 재료 추론, 레시피 추론 두 가지를 함<br>
 <br>
 
-## /RecipeBowl/data
+### /RecipeBowl/data
 iid : ingredient id<br>
 rid : recipe id<br>
 로 추정됨<br>
@@ -50,8 +50,19 @@ EncoderModules의 load_flavorgraph_vectors함수에서 flavorgraph에서 만들�
 위 세 개는 모델의 input으로 넣을 레시피들의 dataset임<br>
 11. vocab.bin<br>
 flavorgraph의 임베딩 벡터를 사용하지 않는다고 할 때 그냥 워드벡터를 가져오는데 그 워드벡터 데이터가 이것임<br>
-
 <br>
+
+### 실제 실행
+1. 레시피, 식재료 데이터 로드
+2. train.sh을 실행했다면 train, valid 데이터를 이용하여 학습한 후 모델 파라미터 데이터를 last.mdl파일로 저장
+3. last.mdl 파일을 갖고 evaluation 과정을 거침
+
+- 근데 문제가 있음<br>
+생각보다 accuracy가 너무 낮다. 논문에도 써있긴 함.<br>
+결과물들을 실제로 보니 이걸 활용하는게 맞나 싶다. 왜냐하면 실제 target ingredient와 #0(0순위) rec ingredient를 비교해보면(우리가 이 모델을 그대로 쓰게 된다면) target ingredient와 너무 다른 식재료를 추천하게 된다(target ingredient의 대체 식재료가 아니게 된다)<br>
+recipebowl은 target ingredient의 대체 식재료가 아니라, 현재 보유 식재료들(input)들과 섞였을 때 가장 잘 어울릴 수 있는 식재료를 찾기 때문에 우리가 풀려는 문제의 솔루션은 아닌 것 같다.<br>
+ex) 토마토 파스타 레시피에서 토마토소스가 없다고 칠 때 우리가 상상한 것은 토마토와 비슷한 맛을 낼 수 있는 재료가 나오는 것이었으나, 실제로는 이 식재료들과 다른 어떤 것을 조합하여 가장 괜찮은 맛을 낼 수 있는, 까르보나라 크림을 추천하는 느낌
+
 
 ## self Q&A
 Q. flavorgraph는 어디에 쓰인다는건가?<br>
@@ -59,3 +70,7 @@ A. 식재료를 벡터로 만들 때만 쓰임<br>
 <br>
 Q. recipebowl을 어떻게 활용할 수 있을까?<br>
 A. 디코더의 q,k,v를 어떻게 잘 바꾸면 되지 않을까 하는, 잠깐 생각해서 나온 아이디어가 있다.<br>
+
+## 아이디어
+우리는 어떤 레시피에 대해 무슨 식재료가 빠졌는지 무작위로 빠지게 되는데 recipebowl은 tf-idf 스코어가 높은 식재료를 타겟으로 학습했다.<br>
+tf-idf가 높은 식재료일수록 이 레시피에서 중요한 식재료라고 인식할 수 있을텐데, 그렇다면 우리는 어떤 레시피에 대한 recipebowl의 #0 rec ingredient를 일단 던져준 다음, 이게 얼마나 괜찮은 레시피인지 알려주는 정도를 이 식재료의 tf-idf로 계산해보면 되지 않을까?
