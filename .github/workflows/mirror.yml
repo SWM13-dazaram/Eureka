@@ -9,7 +9,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - run: echo "prv key ${{ secrets.GITLAB_SSH_PRIVATE_KEY }}"
       - uses: pixta-dev/repository-mirroring-action@v1.1.0
         with:
           target_repo_url:
